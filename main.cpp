@@ -3,14 +3,13 @@
 // BE3029 - Electronica Digital 2
 // Juan Pablo Vivas
 // 11/02/2025
-// Laboratorio 4 DII parte C
+// Laboratorio 4 DII parte A
 // MCU: ESP32 dev kit 1.0
 //******************************************/
 // Librerias
 //******************************************/
 #include <Arduino.h>
 #include <stdint.h>
-//      Inclusión de libería para control de PWM
 #include "driver/ledc.h"
 //******************************************/
 // Definiciones
@@ -32,11 +31,9 @@
 #define canalServo 3
 
 #define freqPWM 100
-//    Frecuencia especial Servomotor
 #define freqServo 50
 
 #define resPWM 10
-//    Alta resolución para mejor control de posición
 #define resServo 12
 
 //******************************************/
@@ -49,7 +46,7 @@ void initPWM(void);
 void IntensidadLEDs(uint16_t valor, uint8_t canal);
 void CambioLED(uint16_t valor2);
 
-// Prototipos ISRs
+// ISRs
 void IRAM_ATTR btn1_ISR(void);
 void IRAM_ATTR btn2_ISR(void);
 
@@ -81,7 +78,7 @@ void IRAM_ATTR btn1_ISR(void){
 void IRAM_ATTR btn2_ISR(void){
   uint32_t tiempoActual2 = millis();
   if (tiempoActual2 - lastISRbtn2 > delayBounce){
-    cont2 = (cont2 - 1 + 5) % 5;
+    cont2 = (cont2 + 1) % 5;
     btn2Pressed = true;
     lastISRbtn2 = tiempoActual2;
   } 
@@ -114,7 +111,6 @@ void loop() {
 // Otras funciones
 //******************************************/
 void initServo(void){
-  //    Condiciones predeterminadas y calculadas para servomotor
   ledcSetup(canalServo, freqServo, resServo);
 
   ledcAttachPin(Servo, canalServo);
@@ -170,19 +166,34 @@ void IntensidadLEDs(uint16_t valor, uint8_t canal) {
 void PosServo(uint16_t valorS, uint8_t canalS) {
   switch (valorS) {
     case 0:
-      ledcWrite(canalS, 146); //    Prueba y error para rangos servomotor
+      ledcWrite(canalS, 146);
+      ledcWrite(canalA, 1023);
+      ledcWrite(canalV, 1023);
+      ledcWrite(canalR, 1023);
       break;
     case 1:
       ledcWrite(canalS, 216);
+      ledcWrite(canalV, 1023);
+      ledcWrite(canalA, 0);
+      ledcWrite(canalR, 0);
       break;
     case 2:
       ledcWrite(canalS, 299);
+      ledcWrite(canalA, 1023);
+      ledcWrite(canalV, 0);
+      ledcWrite(canalR, 0); 
       break;
     case 3:
       ledcWrite(canalS, 382);
+      ledcWrite(canalR, 1023);
+      ledcWrite(canalA, 0);
+      ledcWrite(canalV, 0);
       break;
     case 4:
       ledcWrite(canalS, 465);
+      ledcWrite(canalA, 1023);
+      ledcWrite(canalV, 1023);
+      ledcWrite(canalR, 1023);
       break;
   }
 }
@@ -199,8 +210,7 @@ void CambioLED(uint16_t valor2){
       IntensidadLEDs(cont2, canalA);
       break;
     case 3:
-      PosServo(cont2, canalServo); //    Implementación de rangos especiales para control de servo
+      PosServo(cont2, canalServo);
       break;
   }
 }
-
