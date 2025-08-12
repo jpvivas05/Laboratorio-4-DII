@@ -10,6 +10,7 @@
 //******************************************/
 #include <Arduino.h>
 #include <stdint.h>
+//      Inclusión de libería para control de PWM
 #include "driver/ledc.h"
 //******************************************/
 // Definiciones
@@ -31,9 +32,11 @@
 #define canalServo 3
 
 #define freqPWM 100
+//    Frecuencia especial Servomotor
 #define freqServo 50
 
 #define resPWM 10
+//    Alta resolución para mejor control de posición
 #define resServo 12
 
 //******************************************/
@@ -46,7 +49,7 @@ void initPWM(void);
 void IntensidadLEDs(uint16_t valor, uint8_t canal);
 void CambioLED(uint16_t valor2);
 
-// ISRs
+// Prototipos ISRs
 void IRAM_ATTR btn1_ISR(void);
 void IRAM_ATTR btn2_ISR(void);
 
@@ -111,6 +114,7 @@ void loop() {
 // Otras funciones
 //******************************************/
 void initServo(void){
+  //    Condiciones predeterminadas y calculadas para servomotor
   ledcSetup(canalServo, freqServo, resServo);
 
   ledcAttachPin(Servo, canalServo);
@@ -166,7 +170,7 @@ void IntensidadLEDs(uint16_t valor, uint8_t canal) {
 void PosServo(uint16_t valorS, uint8_t canalS) {
   switch (valorS) {
     case 0:
-      ledcWrite(canalS, 146);
+      ledcWrite(canalS, 146); //    Prueba y error para rangos servomotor
       break;
     case 1:
       ledcWrite(canalS, 216);
@@ -195,7 +199,8 @@ void CambioLED(uint16_t valor2){
       IntensidadLEDs(cont2, canalA);
       break;
     case 3:
-      PosServo(cont2, canalServo);
+      PosServo(cont2, canalServo); //    Implementación de rangos especiales para control de servo
       break;
   }
 }
+
