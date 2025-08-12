@@ -3,7 +3,7 @@
 // BE3029 - Electronica Digital 2
 // Juan Pablo Vivas
 // 11/02/2025
-// Laboratorio 4 DII parte A
+// Laboratorio 4 DII parte C
 // MCU: ESP32 dev kit 1.0
 //******************************************/
 // Librerias
@@ -18,6 +18,8 @@
 #define LEDv 18
 #define LEDa 5
 
+#define Servo 13
+
 #define btn1 33
 #define btn2 23
 
@@ -26,14 +28,18 @@
 #define canalR 0
 #define canalV 1
 #define canalA 2
+#define canalServo 3
 
 #define freqPWM 100
+#define freqServo 50
 
 #define resPWM 10
+#define resServo 12
 
 //******************************************/
 // Prototipos de funciones
 //******************************************/
+void initServo(void);
 void initbtn(void);
 void initleds(void);
 void initPWM(void);
@@ -63,7 +69,7 @@ volatile uint32_t lastISRbtn2 = 0;
 void IRAM_ATTR btn1_ISR(void){
   uint32_t tiempoActual1 = millis();
   if (tiempoActual1 - lastISRbtn1 > delayBounce){
-    cont1 = (cont1 + 1) % 3;
+    cont1 = (cont1 + 1) % 4;
     btn1Pressed = true;
     lastISRbtn1 = tiempoActual1;
   } 
@@ -72,7 +78,7 @@ void IRAM_ATTR btn1_ISR(void){
 void IRAM_ATTR btn2_ISR(void){
   uint32_t tiempoActual2 = millis();
   if (tiempoActual2 - lastISRbtn2 > delayBounce){
-    cont2 = (cont2 - 1 + 4) % 4;
+    cont2 = (cont2 - 1 + 5) % 5;
     btn2Pressed = true;
     lastISRbtn2 = tiempoActual2;
   } 
@@ -85,6 +91,7 @@ void setup() {
   initbtn();
   initleds();
   initPWM();
+  initServo();
 }
 
 //******************************************/
@@ -103,6 +110,11 @@ void loop() {
 //******************************************/
 // Otras funciones
 //******************************************/
+void initServo(void){
+  ledcSetup(canalServo, freqServo, resServo);
+
+  ledcAttachPin(Servo, canalServo);
+}
 void initPWM(void){
   //    Asignar canales
   ledcSetup(canalR, freqPWM, resPWM);
@@ -145,6 +157,29 @@ void IntensidadLEDs(uint16_t valor, uint8_t canal) {
     case 3:
       ledcWrite(canal, 990);
       break;
+    case 4:
+      ledcWrite(canal, 1023);
+      break;
+  }
+}
+
+void PosServo(uint16_t valorS, uint8_t canalS) {
+  switch (valorS) {
+    case 0:
+      ledcWrite(canalS, 146);
+      break;
+    case 1:
+      ledcWrite(canalS, 216);
+      break;
+    case 2:
+      ledcWrite(canalS, 299);
+      break;
+    case 3:
+      ledcWrite(canalS, 382);
+      break;
+    case 4:
+      ledcWrite(canalS, 465);
+      break;
   }
 }
 
@@ -158,6 +193,9 @@ void CambioLED(uint16_t valor2){
       break;
     case 2:
       IntensidadLEDs(cont2, canalA);
+      break;
+    case 3:
+      PosServo(cont2, canalServo);
       break;
   }
 }
